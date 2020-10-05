@@ -1,24 +1,25 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Route, Switch } from 'react-router-dom';
+
+import HomePage from './components/pages/home-page';
+import LoginPage from './components/pages/login-page/LoginPage';
+import RegisterPage from './components/pages/register-page';
+import Header from './components/header';
+
+import s from './App.module.sass';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={s.wrapper}>
+      <Switch>
+        <Route path="/" component={HomePage} exact />
+        <>
+          <Header />
+          <Route path="/login" component={LoginPage} exact />
+          <Route path="/register" component={RegisterPage} exact />
+        </>
+        <Route render={() => <h1>404 Pege Not Found!</h1>} />
+      </Switch>
     </div>
   );
 }
