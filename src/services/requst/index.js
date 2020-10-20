@@ -1,3 +1,3 @@
-import {fetchRequst, fetchPopularTags, fetchArticles} from "./requsts";
+import { fetchRequst, fetchPopularTags, fetchArticles, API, fetchAPI, fetchFeedArticles } from "./requsts";
 
-export {fetchRequst, fetchPopularTags, fetchArticles};
+export { fetchRequst, fetchPopularTags, fetchArticles, API, fetchAPI, fetchFeedArticles };

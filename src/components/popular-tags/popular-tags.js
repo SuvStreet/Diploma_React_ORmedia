@@ -29,7 +29,7 @@ const PopularTags = () => {
         fetchPopularTags().then((res) => {
             setPopularTags(res);
         })
-    });
+    }, []);
 
     return (
         <Container className={classes.popularTag}>

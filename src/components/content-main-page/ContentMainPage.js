@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Pagination from "@material-ui/lab/Pagination";
-import {Paper, Tabs, Tab, Box, Grid, CircularProgress, Container} from '@material-ui/core';
+import { Paper, Tabs, Tab, Box, Grid, CircularProgress, Container, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Redirect } from "react-router-dom";
 
 import CardArticle from "../card-article/CardArticle";
 import { fetchRequst } from "../../services/requst";
@@ -48,7 +49,8 @@ function a11yProps(index) {
 
 const ContentMainPage = () => {
   const classes = useStyles();
-  const [value, setValue] = useState(1);
+  const numberTab = localStorage.getItem("diplomaToken") ? 0 : 1;
+  const [value, setValue] = useState(numberTab);
 
   const [isLogading, setIsLogading] = useState(true);
   const [data, setData] = useState("");
@@ -89,7 +91,10 @@ const ContentMainPage = () => {
                 <Tab label="Global Feed" {...a11yProps(1)} />
               </Tabs>
               <TabPanel value={value} index={0}>
-                Item One
+                {localStorage.getItem("diplomaToken")
+                  ? <Typography>Item one</Typography>
+                  : <Redirect to="/login" />
+                }
               </TabPanel>
               <TabPanel value={value} index={1}>
                 {isLogading

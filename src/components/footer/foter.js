@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
        backgroundColor: "#ededed",
        fontSize: "15px",
        color: "grey",
+       marginTop: theme.spacing(3),
        /* position: "absolute",
        bottom: 0,
        width: "100%" */
