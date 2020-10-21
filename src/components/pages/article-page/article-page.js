@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, CircularProgress, Container, Typography } from "@material-ui/core";
+import { Button, ButtonGroup, Chip, CircularProgress, Container, Typography } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import { CardHeader, Avatar } from "@material-ui/core";
@@ -7,6 +7,8 @@ import AddIcon from '@material-ui/icons/Add';
 
 import { fetchArticles } from "../../../services/requst";
 import { FormatData } from "../../format-date";
+import { withRouter } from "react-router-dom";
+import Comments from "../../comments/comments";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -40,71 +42,73 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const ArticlePage = () => {
+const ArticlePage = ({ match }) => {
+    const { id } = match.params;
+
     const classes = useStyles();
 
-    const [data, setData] = useState([]);
-    const [img, setImg] = useState("");
-    const [author, setAuthor] = useState("");
+    const [data, setData] = useState(undefined);
 
     useEffect(() => {
-        let slug = localStorage.getItem('slug');
-        if (slug !== null) {
-            fetchArticles(slug).then((res) => {
-                setData(res.article);
-                setImg(res.article.author.image);
-                setAuthor(res.article.author.username);
-                //localStorage.removeItem('slug');
-            })
-        }
-    }, [])
+        fetchArticles(id).then((res) => {
+            setData(res.article);
+        })
+    }, []);
 
-    console.log("###: Data", data);
+    /* if (data !== undefined) {
+        console.log("###: data", data);
+    } */
 
     return (
         <>
             {data === undefined
                 ? <CircularProgress />
-                : <div className={classes.root}>
-                    <Container maxWidth="md">
-                        <Typography variant="h3" className={classes.titleArticle}>{data.title}</Typography>
-                        <CardHeader className={classes.card}
-                            avatar={
-                                <Avatar aria-label="recipe" src={img} />
-                            }
-                            action={
-                                <ButtonGroup disableElevation variant="contained" color="primary" className={classes.btnGr}>
-                                    <Button>
-                                        <AddIcon />
+                : <>
+                    <div className={classes.root}>
+                        <Container maxWidth="md">
+                            <Typography variant="h3" className={classes.titleArticle}>{data.title}</Typography>
+                            <CardHeader className={classes.card}
+                                avatar={
+                                    <Avatar aria-label="recipe" src={data.author.image} />
+                                }
+                                action={
+                                    <ButtonGroup disableElevation variant="contained" color="primary" className={classes.btnGr}>
+                                        <Button>
+                                            <AddIcon />
                                         Follow TestingCypress
                                     </Button>
-                                    <Button>
-                                        <FavoriteIcon />
+                                        <Button>
+                                            <FavoriteIcon />
                                         Follow TestingCypress ({data.favoritesCount})
                                     </Button>
-                                </ButtonGroup>}
-                            title={
-                                <Typography className={classes.cardTitl}>
-                                    {author}
-                                </Typography>}
-                            subheader={
-                                <Typography className={classes.cardSub}>
-                                    {FormatData(data.createdAt)}
-                                </Typography>
-                            }
-                        />
+                                    </ButtonGroup>}
+                                title={
+                                    <Typography className={classes.cardTitl}>
+                                        {data.author.username}
+                                    </Typography>}
+                                subheader={
+                                    <Typography className={classes.cardSub}>
+                                        {FormatData(data.createdAt)}
+                                    </Typography>
+                                }
+                            />
+                        </Container>
+                    </div>
+                    <Container maxWidth="md" >
+                        <Typography variant="h5" className={classes.articleBody}>
+                            {data.body}
+                        </Typography>
+                        {data.tagList.length !== 0
+                            ? data.tagList.map((tag, index) => <Chip label={tag} key={index} />)
+                            : null}
+                        <hr />
+
+                        {localStorage.getItem("diplomaToken") ? <Comments img={data.author.image}/> : null}
                     </Container>
-                </div>
+                </>
             }
-            <Container maxWidth="md" >
-                <Typography variant="h5" className={classes.articleBody}>
-                    {data.body}
-                </Typography>
-                <hr />
-            </Container>
-           
         </>
     )
 }
 
-export default ArticlePage;
+export default withRouter(ArticlePage);

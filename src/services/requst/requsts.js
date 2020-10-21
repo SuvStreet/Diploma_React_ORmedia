@@ -46,11 +46,18 @@ const fetchAPI = async (emailValue, passwordValue) => {
 const API = axios.create({
   baseURL: "https://conduit.productionready.io/api",
   responseType: "json",
+  headers: { "Authorization": localStorage.getItem("diplomaToken") ? `Token ${localStorage.getItem("diplomaToken")}` : "" }
 });
 
 const fetchFeedArticles = async (numberPage) => {
+  const token = localStorage.getItem("diplomaToken")
   const res = await fetch(
-    `https://conduit.productionready.io/api/articles/feed?limit=10&offset=${numberPage}`
+    `https://conduit.productionready.io/api/articles/feed?limit=10&offset=${numberPage}`, {
+    method: 'GET',
+    headers: {
+      "Authorization": `Token ${token}`,
+    }
+  }
   );
   const body = await res.json();
   return body;

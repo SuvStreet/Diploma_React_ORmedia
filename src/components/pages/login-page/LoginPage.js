@@ -17,6 +17,7 @@ const LoginPage = () => {
 
     const [emailValue, setEmailValue] = useState('');
     const [pasValue, setPasValue] = useState('');
+
     const [isLogin, setIsLogin] = useState(false);
 
     const handleEmail = (event) => {
@@ -49,9 +50,10 @@ const LoginPage = () => {
             }
         });
         localStorage.setItem('diplomaToken', userData.data.user.token);
-        localStorage.setItem("userDiploma", userData.data.user.username)
-        console.log("####: data", userData);
+        localStorage.setItem('diplomaUserImg', userData.data.user.image);
+        localStorage.setItem("diplomaUsername", userData.data.user.username);
         setIsLogin(true);
+        //console.log("####: data", userData);
         /* }
         catch (e) {
             //console.log(`😱 Axios request failed: ${e}`);
@@ -120,7 +122,9 @@ const LoginPage = () => {
 
     return (
         <Container component="main" maxWidth="xs">
-            {isLogin ? <Redirect to="/" /> : render()}
+            {localStorage.getItem('diplomaToken')
+                ? <Redirect to="/" />
+                : render()}
         </Container>
     );
 }

@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
 
 import CardArticle from "../card-article/CardArticle";
-import { fetchRequst } from "../../services/requst";
+import { fetchFeedArticles, fetchRequst } from "../../services/requst";
 import PopularTags from "../popular-tags";
 
 const useStyles = makeStyles((theme) => ({
@@ -58,11 +58,22 @@ const ContentMainPage = () => {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    fetchRequst(nemberRequest).then((res) => {
-      setIsLogading(false);
-      setData(res);
-    })
-  }, [setIsLogading, setData, nemberRequest]);
+    if (value === 0) {
+      if (localStorage.getItem("diplomaToken") !== null) {
+        fetchFeedArticles(nemberRequest).then((res) => {
+          setIsLogading(false);
+          setData(res);
+        })
+      }
+    }
+    else {
+      fetchRequst(nemberRequest).then((res) => {
+        setIsLogading(false);
+        setData(res);
+      })
+    }
+
+  }, [setIsLogading, setData, nemberRequest, value]);
 
   const onNumberPage = (e, value) => {
     setIsLogading(true);
@@ -72,6 +83,9 @@ const ContentMainPage = () => {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    setPage(1);
+    setNemberRequest(0);
+    setIsLogading(true);
   };
 
   return (
@@ -92,7 +106,11 @@ const ContentMainPage = () => {
               </Tabs>
               <TabPanel value={value} index={0}>
                 {localStorage.getItem("diplomaToken")
-                  ? <Typography>Item one</Typography>
+                  ? isLogading
+                    ? <CircularProgress />
+                    : data.articles !== undefined
+                      ? data.articles.map((i, index) => (<CardArticle props={data.articles[index]} key={index} />))
+                      : null
                   : <Redirect to="/login" />
                 }
               </TabPanel>

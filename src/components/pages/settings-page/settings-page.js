@@ -27,25 +27,22 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const nameUser = localStorage.getItem("userDiploma")
-
 const SettingsPage = () => {
     const classes = useStyles();
 
-    const [infoUser, setInfoUser] = useState(nameUser);
-
-    //console.log(infoUser)
+    const [username, setUsername] = useState(localStorage.getItem("diplomaUsername"));
 
     const hendelExit = () => {
         localStorage.removeItem("diplomaToken");
-        localStorage.removeItem("userDiploma");
-        setInfoUser("");
+        localStorage.removeItem("diplomaUserImg");
+        localStorage.removeItem("diplomaUsername");
+        setUsername(null);
     }
 
     return (
-        <>
-            {infoUser !== "" ? null : <Redirect to="/" />}
-            <Container maxWidth="xs" className={classes.rootContainer}>
+        username === null
+            ? <Redirect to="/" />
+            : <Container maxWidth="xs" className={classes.rootContainer}>
                 <Typography variant="h5">Your Settings</Typography>
                 <form className={classes.rootForm} noValidate autoComplete="on">
                     <TextField label="URL of profile picture" variant="outlined" fullWidth className={classes.input} />
@@ -69,7 +66,6 @@ const SettingsPage = () => {
                     Or click here to logout
                 </Button>
             </Container>
-        </>
     )
 }
 

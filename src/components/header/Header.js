@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, ButtonGroup, makeStyles, Typography } from "@material-ui/core";
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import CreateIcon from '@material-ui/icons/Create';
 import SettingsIcon from '@material-ui/icons/Settings';
 
@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Header = () => {
+
     const classes = useStyles();
 
     const renderNoAutorisatiopn = () => {
@@ -50,7 +51,7 @@ const Header = () => {
                     </Button>
                     <Button>
                         <Link to="/user"  >
-                            {localStorage.getItem("userDiploma")}
+                            {localStorage.getItem("diplomaUsername")}
                         </Link>
                     </Button>
                 </ButtonGroup>

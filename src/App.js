@@ -11,6 +11,7 @@ import Header from './components/header';
 import Footer from './components/footer';
 
 import s from './App.module.sass';
+import UserInfoContext from './context/userInfoContext';
 
 
 
@@ -23,7 +24,7 @@ function App() {
           <Header />
           <Route path="/login" component={LoginPage} exact />
           <Route path="/register" component={RegisterPage} exact />
-          <Route path="/article" component={ArticlePage} exact/>
+          <Route path="/article/:id" component={ArticlePage} />
           <Route path="/settings" component={SettingsPage} exact />
           <Route path="/new_article" component={NewArticlePage} exact />
           <Footer />

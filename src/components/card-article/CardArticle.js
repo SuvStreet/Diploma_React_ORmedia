@@ -16,14 +16,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CardArticle = ({ props }) => {
+
     const classes = useStyles();
 
-    const handleAtributArticle = () => {
-        //console.log("###: this.props", props.slug);
-        localStorage.setItem('slug', props.slug);
-    }
-
     //console.log("###: this.props", props);
+    
     return (
         <>
             <Card className={classes.root}>
@@ -48,7 +45,7 @@ const CardArticle = ({ props }) => {
                         {props.description}
                     </Typography>
                     <Typography variant="body1" color="textSecondary" paragraph>
-                        <Link component={RouterLink} to="/article" onClick={handleAtributArticle}>
+                        <Link component={RouterLink} to={`/article/${props.slug}`}>
                             Read more...
                         </Link>
                     </Typography>
