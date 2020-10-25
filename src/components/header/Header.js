@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Button, ButtonGroup, makeStyles, Typography } from "@material-ui/core";
+import { Avatar, Button, ButtonGroup, makeStyles, Typography } from "@material-ui/core";
 import { Link, withRouter } from 'react-router-dom';
 import CreateIcon from '@material-ui/icons/Create';
 import SettingsIcon from '@material-ui/icons/Settings';
 
 import s from "./Header.module.sass"
+import { connect } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
     styleIcon: {
@@ -12,16 +13,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Header = () => {
+const Header = ({username, image}) => {
 
     const classes = useStyles();
 
     const renderNoAutorisatiopn = () => {
         return (
             <ButtonGroup variant="text" color="primary" aria-label="text primary button group" className={s.headerButtonGroup}>
-                <Button>
-                    <Link to="/">Home</Link>
-                </Button>
                 <Button>
                     <Link to="/login">Sign in</Link>
                 </Button>
@@ -37,9 +35,6 @@ const Header = () => {
             <>
                 <ButtonGroup variant="text" color="primary" aria-label="text primary button group" className={s.headerButtonGroup}>
                     <Button>
-                        <Link to="/">Home</Link>
-                    </Button>
-                    <Button>
                         <Link to="/new_article">
                             <CreateIcon className={classes.styleIcon} /> New Article
                         </Link>
@@ -50,8 +45,9 @@ const Header = () => {
                         </Link>
                     </Button>
                     <Button>
-                        <Link to="/user"  >
-                            {localStorage.getItem("diplomaUsername")}
+                        <Avatar alt="img" src={image} />
+                        <Link to="/profile"  >
+                            {username}
                         </Link>
                     </Button>
                 </ButtonGroup>
@@ -68,7 +64,13 @@ const Header = () => {
             {localStorage.getItem("diplomaToken") ? renderYesAutorisatiopn() : renderNoAutorisatiopn()}
         </div>
     )
-
 }
 
-export default Header;
+const mapStateToProps = (state) => {
+    return {
+        image: state.image,
+        username: state.username
+    };
+};
+
+export default connect(mapStateToProps, null)(Header);

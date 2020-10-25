@@ -8,7 +8,8 @@ import AddIcon from '@material-ui/icons/Add';
 import { fetchArticles } from "../../../services/requst";
 import { FormatData } from "../../format-date";
 import { withRouter } from "react-router-dom";
-import Comments from "../../comments/comments";
+import AddComments from "../../add-comments/add-comments";
+import { Height } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -54,17 +55,13 @@ const ArticlePage = ({ match }) => {
             setData(res.article);
         })
     }, []);
-
-    /* if (data !== undefined) {
-        console.log("###: data", data);
-    } */
-
+    
     return (
         <>
             {data === undefined
                 ? <CircularProgress />
                 : <>
-                    <div className={classes.root}>
+                    <div className={classes.root} /* style={heightTest} */ >
                         <Container maxWidth="md">
                             <Typography variant="h3" className={classes.titleArticle}>{data.title}</Typography>
                             <CardHeader className={classes.card}
@@ -75,12 +72,12 @@ const ArticlePage = ({ match }) => {
                                     <ButtonGroup disableElevation variant="contained" color="primary" className={classes.btnGr}>
                                         <Button>
                                             <AddIcon />
-                                        Follow TestingCypress
-                                    </Button>
+                                            Unfollow wildantinker
+                                        </Button>
                                         <Button>
                                             <FavoriteIcon />
-                                        Follow TestingCypress ({data.favoritesCount})
-                                    </Button>
+                                            Follow TestingCypress ({data.favoritesCount})
+                                        </Button>
                                     </ButtonGroup>}
                                 title={
                                     <Typography className={classes.cardTitl}>
@@ -103,7 +100,7 @@ const ArticlePage = ({ match }) => {
                             : null}
                         <hr />
 
-                        {localStorage.getItem("diplomaToken") ? <Comments img={data.author.image}/> : null}
+                        {localStorage.getItem("diplomaToken") ? <AddComments img={data.author.image} /> : null}
                     </Container>
                 </>
             }

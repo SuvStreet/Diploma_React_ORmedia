@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import { Chip, Container, Typography, CircularProgress } from "@material-ui/core";
 
-import { fetchPopularTags } from "../../services/requst";
+import { API, fetchPopularTags } from "../../services/requst";
 
 const useStyles = makeStyles(() => ({
     popularTag: {
         backgroundColor: "#ededed",
         borderRadius: 5,
-        paddingBottom: 10
+        paddingBottom: 10,
+        /* position: "fixed", */
     },
     customChip: {
         backgroundColor: "#5f5f5f",
@@ -23,20 +24,23 @@ const useStyles = makeStyles(() => ({
 const PopularTags = () => {
     const classes = useStyles();
 
-    const [popularTags, setPopularTags] = useState("");
+    const [popularTags, setPopularTags] = useState(null);
+
+    async function fetchData() {
+        const tags = await API.get(`https://conduit.productionready.io/api/tags`);
+        setPopularTags(tags.data.tags);
+    }
 
     useEffect(() => {
-        fetchPopularTags().then((res) => {
-            setPopularTags(res);
-        })
+        fetchData();
     }, []);
 
     return (
         <Container className={classes.popularTag}>
             <Typography variant="h6">Popular Tags</Typography>
-            {popularTags.tags === undefined
+            {popularTags === null
                 ? <CircularProgress />
-                : popularTags.tags.map((i, index) => (<Chip label={popularTags.tags[index]} className={classes.customChip} key={index} />))}
+            : popularTags.map((i, index) => (<Chip label={`#${popularTags[index]}`} className={classes.customChip} key={index} />))}
         </Container>
     )
 }

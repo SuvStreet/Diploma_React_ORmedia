@@ -7,11 +7,11 @@ import RegisterPage from './components/pages/register-page';
 import ArticlePage from './components/pages/article-page';
 import SettingsPage from './components/pages/settings-page/settings-page';
 import NewArticlePage from './components/pages/new-article-page/new-article-page';
+import Profile from './components/pages/profile/profile';
 import Header from './components/header';
 import Footer from './components/footer';
 
-import s from './App.module.sass';
-import UserInfoContext from './context/userInfoContext';
+import s from './App.module.sass'
 
 
 
@@ -27,6 +27,7 @@ function App() {
           <Route path="/article/:id" component={ArticlePage} />
           <Route path="/settings" component={SettingsPage} exact />
           <Route path="/new_article" component={NewArticlePage} exact />
+          <Route path="/profile" component={Profile} exact/>
           <Footer />
         </>
         <Route render={() => <h1>404 Pege Not Found!</h1>} />

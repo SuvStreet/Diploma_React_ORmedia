@@ -12,8 +12,10 @@ import { Redirect } from 'react-router-dom';
 import { API, fetchAPI } from '../../../services/requst/requsts';
 
 import s from "./LoginPage.module.sass"
+import { connect } from 'react-redux';
+import { userLoginIn } from '../../../actions/actions';
 
-const LoginPage = () => {
+const LoginPage = ({ onLogIn, username, image }) => {
 
     const [emailValue, setEmailValue] = useState('');
     const [pasValue, setPasValue] = useState('');
@@ -22,43 +24,24 @@ const LoginPage = () => {
 
     const handleEmail = (event) => {
         setEmailValue(event.target.value);
-        //console.log("####: email", emailValue);
     };
 
     const handlePassword = (event) => {
         setPasValue(event.target.value);
-        //console.log("####: pas", pasValue);
     };
 
     const hendleAutorithation = async (e) => {
         e.preventDefault();
-        /* fetchAPI(emailValue, pasValue).then(data => {
-            if (data.errors) {
-                console.log("####: dataError", data);
-            }
-            else if (data.user) {
-                //localStorage.setItem('diplomaToken', userData.data.user.token);
-                setLoggedIn(true);
-                console.log("####: data", data);
-            }
-        }) */
-        /* try { */
         let userData = await API.post("https://conduit.productionready.io/api/users/login", {
             user: {
                 email: emailValue,
                 password: pasValue,
             }
         });
+        //onLogIn(userData.data.user.image, userData.data.user.username);
+        onLogIn(userData.data.user);
         localStorage.setItem('diplomaToken', userData.data.user.token);
-        localStorage.setItem('diplomaUserImg', userData.data.user.image);
-        localStorage.setItem("diplomaUsername", userData.data.user.username);
         setIsLogin(true);
-        //console.log("####: data", userData);
-        /* }
-        catch (e) {
-            //console.log(`😱 Axios request failed: ${e}`);
-            console.log(`###: error`, e.message);
-        } */
     }
 
     const render = () => {
@@ -69,8 +52,8 @@ const LoginPage = () => {
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Sign in
-                    </Typography>
-                <form className={s.form} noValidate>
+                </Typography>
+                <form className={s.form} noValidate /* onSubmit={onLogIn} */>
                     <TextField
                         variant="outlined"
                         margin="normal"
@@ -129,4 +112,17 @@ const LoginPage = () => {
     );
 }
 
-export default LoginPage;
+const mapStateToProps = (state) => {
+    return {
+        image: state.image,
+        username: state.username
+    };
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onLogIn: (image, username) => dispatch(userLoginIn(image, username)),
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);

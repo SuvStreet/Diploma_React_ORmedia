@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const nameUser = localStorage.getItem("diplomaUsername");
+const token = localStorage.getItem("diplomaToken");
 
 const NewArticlePage = () => {
     const classes = useStyles();
@@ -91,10 +91,10 @@ const NewArticlePage = () => {
             </>
         )
     }
-
+    
     return (
         <>
-            {nameUser === null
+            {token === null
                 ? <Redirect to="/" />
                 : <Container maxWidth="sm" className={classes.rootContainer}>
                     <Typography variant="h5">Your New Article</Typography>

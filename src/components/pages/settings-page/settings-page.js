@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { Redirect } from "react-router-dom";
+import { connect } from "react-redux";
+import { userLoginOut } from "../../../actions/actions";
 
 const useStyles = makeStyles((theme) => ({
     rootContainer: {
@@ -27,26 +29,36 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const SettingsPage = () => {
+const SettingsPage = ({ onLogOut, image, username, email }) => {
     const classes = useStyles();
 
-    const [username, setUsername] = useState(localStorage.getItem("diplomaUsername"));
+    const [userToken, setUserToken] = useState(localStorage.getItem("diplomaToken"));
 
     const hendelExit = () => {
         localStorage.removeItem("diplomaToken");
-        localStorage.removeItem("diplomaUserImg");
-        localStorage.removeItem("diplomaUsername");
-        setUsername(null);
+        onLogOut(null);
+        setUserToken(null);
     }
 
     return (
-        username === null
+        userToken === null
             ? <Redirect to="/" />
             : <Container maxWidth="xs" className={classes.rootContainer}>
                 <Typography variant="h5">Your Settings</Typography>
                 <form className={classes.rootForm} noValidate autoComplete="on">
-                    <TextField label="URL of profile picture" variant="outlined" fullWidth className={classes.input} />
-                    <TextField label="Username *" variant="outlined" fullWidth className={classes.input} />
+                    <TextField
+                        label="URL of profile picture"
+                        variant="outlined"
+                        fullWidth
+                        defaultValue={image}
+                        className={classes.input}
+                    />
+                    <TextField
+                        label="Username *"
+                        variant="outlined"
+                        fullWidth
+                        defaultValue={username}
+                        className={classes.input} />
                     <TextField
                         id="outlined-multiline-static"
                         label="Short bio about you"
@@ -55,7 +67,13 @@ const SettingsPage = () => {
                         variant="outlined"
                         className={classes.input}
                     />
-                    <TextField label="Email *" variant="outlined" fullWidth className={classes.input} />
+                    <TextField
+                        label="Email *"
+                        variant="outlined"
+                        fullWidth
+                        defaultValue={email}
+                        className={classes.input} 
+                    />
                     <TextField type="password" label="New Password *" variant="outlined" fullWidth className={classes.input} />
                     <Button variant="contained" color="primary" size="large" type="submit" className={classes.btnUpdate}>
                         Update Setting
@@ -69,4 +87,18 @@ const SettingsPage = () => {
     )
 }
 
-export default SettingsPage;
+const mapStateToProps = (state) => {
+    return {
+        image: state.image,
+        username: state.username,
+        email: state.email,
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onLogOut: (image, username) => dispatch(userLoginOut(image, username)),
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);
