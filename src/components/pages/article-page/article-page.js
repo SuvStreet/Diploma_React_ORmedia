@@ -100,7 +100,7 @@ const ArticlePage = ({ match }) => {
                             : null}
                         <hr />
 
-                        {localStorage.getItem("diplomaToken") ? <AddComments img={data.author.image} /> : null}
+                        {localStorage.getItem("diplomaToken") ? <AddComments slug={id}/> : null}
                     </Container>
                 </>
             }

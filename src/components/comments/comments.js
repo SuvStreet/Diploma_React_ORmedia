@@ -32,15 +32,21 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Comments = ({props : {body, author: {image, username}, createdAt, id}}) => {
+const Comments = ({ slug, props: { body, author: { image, username }, createdAt, id } }) => {
     const classes = useStyles();
 
-    const hendleRemoveComment = async (id) => {
-        console.log("###: id", id);
-        //const removeComm = await API.delete(`https://conduit.productionready.io/api/articles/test-y6nim5/comments/${id}`);
-    }
+    const [removeComm, setRemoveComm] = useState(false);
 
-    //console.log("###: image", image);
+    useEffect(() => {
+        if(removeComm){
+            setRemoveComm(false);
+        }
+    }, [removeComm]);
+
+    async function hendleRemoveComment(slug, id) {
+        const comm = await API.delete(`https://conduit.productionready.io/api/articles/${slug}/comments/${id}`);
+        setRemoveComm(true);
+    }
 
     return (
         <>
@@ -57,7 +63,7 @@ const Comments = ({props : {body, author: {image, username}, createdAt, id}}) =>
                         {FormatData(createdAt)}
                     </div>
                     <div className={classes.removeComment}>
-                        <DeleteForeverIcon onClick={hendleRemoveComment} />
+                        <DeleteForeverIcon onClick={() => hendleRemoveComment(slug, id)} />
                     </div>
                 </div>
             </div>
