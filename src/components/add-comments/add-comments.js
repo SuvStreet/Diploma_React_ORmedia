@@ -1,9 +1,11 @@
-import { makeStyles, TextField, Container, Avatar, Button } from "@material-ui/core";
-import { ContactsOutlined } from "@material-ui/icons";
+import { makeStyles, TextField, Container, Avatar, Button, Typography, Link } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import { Link as RouterLink } from 'react-router-dom';
+
 import { API } from "../../services/requst";
-import Comments from "../comments/comments";
+import { FormatData } from "../format-date";
 
 const useStyles = makeStyles((theme) => ({
     inputComment: {
@@ -18,7 +20,33 @@ const useStyles = makeStyles((theme) => ({
     avatarStyle: {
         paddingTop: theme.spacing(2),
         paddingBottom: theme.spacing(2)
-    }
+    },
+
+    containerRoot: {
+        marginTop: theme.spacing(2),
+        border: "#ededed 1px solid",
+    },
+    styleComment: {
+        borderBottom: "#ededed 1px solid",
+        padding: theme.spacing(2),
+    },
+    rootInfoCommentUser: {
+        display: "flex",
+        alignItems: "center",
+        padding: theme.spacing(2),
+    },
+    infoCommentUser: {
+        width: theme.spacing(100),
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+    },
+    style: {
+        marginRight: theme.spacing(1)
+    },
+    removeComment: {
+        cursor: "pointer"
+    }   
 }));
 
 const AddComments = ({ image, slug }) => {
@@ -54,6 +82,35 @@ const AddComments = ({ image, slug }) => {
         setFlagComment(true);
     }
 
+    async function hendleRemoveComment(slug, id) {
+        const comm = await API.delete(`https://conduit.productionready.io/api/articles/${slug}/comments/${id}`);
+        setFlagComment(true);
+    }
+
+    const RenderComments = (index) => {
+        const { body, author: { username }, createdAt, id } = commentInfo[index]
+
+        return (
+            <div key={index} className={classes.containerRoot}>
+                <div className={classes.styleComment}>
+                    <Typography>
+                        {body}
+                    </Typography>
+                </div>
+                <div className={classes.rootInfoCommentUser}>
+                    <div className={classes.infoCommentUser}>
+                        <Avatar src={image} className={classes.style} />
+                        <Link component={RouterLink} to="/profile" className={classes.style}>{username}</Link>
+                        {FormatData(createdAt)}
+                    </div>
+                    <div className={classes.removeComment}>
+                        <DeleteForeverIcon onClick={() => hendleRemoveComment(slug, id)} />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <>
             <Container maxWidth="sm">
@@ -72,7 +129,12 @@ const AddComments = ({ image, slug }) => {
                     <Avatar alt="img" src={image} className={classes.avatarStyle} />
                     <Button variant="contained" color="primary" onClick={handelAddComment}>Post Comment</Button>
                 </Container>
-                {commentInfo === undefined ? null : commentInfo.map((i, index) => (<Comments key={index} slug={slug} props={commentInfo[index]} />))}
+                {/* {commentInfo === undefined ? null : commentInfo.map((i, index) => (<Comments key={index} slug={slug} props={commentInfo[index]} />))} */}
+                {
+                    commentInfo === undefined
+                        ? null
+                        : commentInfo.map((i, index) => (RenderComments(index)))
+                }
             </Container>
         </>
     )
@@ -84,10 +146,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(AddComments);
+export default connect(mapStateToProps, null)(AddComments);

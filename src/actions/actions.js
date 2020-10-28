@@ -16,4 +16,21 @@ const userLoginOut = (user) => {
   };
 };
 
-export { userLoginIn, userLoginOut };
+const popularTags = (article, tab, tag) => {
+  return {
+    type: "POPULAR_TAGS",
+    payload: {
+      article,
+      tab,
+      tag
+    }
+  };
+};
+
+const popularTagsFocusLost = () => {
+  return {
+    type: "POPULAR_TAGS_FOUS_LOST",
+  };
+};
+
+export { userLoginIn, userLoginOut, popularTags, popularTagsFocusLost };

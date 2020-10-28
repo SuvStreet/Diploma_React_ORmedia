@@ -3,10 +3,13 @@ import Pagination from "@material-ui/lab/Pagination";
 import { Paper, Tabs, Tab, Box, Grid, CircularProgress, Container, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Redirect } from "react-router-dom";
+import { popularTagsFocusLost } from "../../actions/actions";
+import { popularTags } from "../../actions/actions";
 
 import CardArticle from "../card-article/CardArticle";
-import { fetchFeedArticles, fetchRequst } from "../../services/requst";
+import { API, fetchFeedArticles, fetchRequst } from "../../services/requst";
 import PopularTags from "../popular-tags";
+import { connect } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   pagin: {
@@ -47,7 +50,7 @@ function a11yProps(index) {
   };
 }
 
-const ContentMainPage = () => {
+const ContentMainPage = ({ articlesPopTag, onClickTabs, tab, tag, onPopularTags }) => {
   const classes = useStyles();
   const numberTab = localStorage.getItem("diplomaToken") ? 0 : 1;
   const [value, setValue] = useState(numberTab);
@@ -58,21 +61,31 @@ const ContentMainPage = () => {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    if (value === 0) {
-      if (localStorage.getItem("diplomaToken") !== null) {
-        fetchFeedArticles(nemberRequest).then((res) => {
+    switch (value) {
+      case 0:
+        if (localStorage.getItem("diplomaToken") !== null) {
+          fetchFeedArticles(nemberRequest).then((res) => {
+            setIsLogading(false);
+            setData(res);
+            onClickTabs();
+          })
+        }
+        break;
+      case 2:
+        const articlePopTag = async () => {
+          const article = await API.get(`https://conduit.productionready.io/api/articles?tag=${tag}&limit=10&offset=${nemberRequest}`);
+          onPopularTags(article.data.articles, tab, tag);
+          setIsLogading(false);
+        }
+        articlePopTag();
+      default:
+        fetchRequst(nemberRequest).then((res) => {
           setIsLogading(false);
           setData(res);
+          onClickTabs();
         })
-      }
+        break;
     }
-    else {
-      fetchRequst(nemberRequest).then((res) => {
-        setIsLogading(false);
-        setData(res);
-      })
-    }
-
   }, [setIsLogading, setData, nemberRequest, value]);
 
   const onNumberPage = (e, value) => {
@@ -82,47 +95,58 @@ const ContentMainPage = () => {
   }
 
   const handleChange = (event, newValue) => {
+    console.log(newValue)
     setValue(newValue);
     setPage(1);
     setNemberRequest(0);
     setIsLogading(true);
   };
 
+  /* console.log("###: articles", data.articles); */
+
   return (
     <>
       <Container maxWidth='lg' className={classes.root}>
         <Grid container spacing={3}>
           <Grid item md={9} xs={12}>
-            <Paper>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                indicatorColor="primary"
-                textColor="primary"
-                centered
-              >
-                <Tab label="Your Feed" {...a11yProps(0)} />
-                <Tab label="Global Feed" {...a11yProps(1)} />
-              </Tabs>
-              <TabPanel value={value} index={0}>
-                {localStorage.getItem("diplomaToken")
-                  ? isLogading
-                    ? <CircularProgress />
-                    : data.articles !== undefined
-                      ? data.articles.map((i, index) => (<CardArticle props={data.articles[index]} key={index} />))
-                      : null
-                  : <Redirect to="/login" />
-                }
-              </TabPanel>
-              <TabPanel value={value} index={1}>
-                {isLogading
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              indicatorColor="primary"
+              textColor="primary"
+              centered
+            >
+              <Tab label="Your Feed" {...a11yProps(0)} />
+              <Tab label="Global Feed" {...a11yProps(1)} />
+              <Tab label={`#${tag}`} {...a11yProps(2)} />
+            </Tabs>
+            <hr />
+            <TabPanel value={value} index={0}>
+              {localStorage.getItem("diplomaToken")
+                ? isLogading
                   ? <CircularProgress />
                   : data.articles !== undefined
                     ? data.articles.map((i, index) => (<CardArticle props={data.articles[index]} key={index} />))
                     : null
+                : <Redirect to="/login" />
+              }
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+              {isLogading
+                ? <CircularProgress />
+                : data.articles !== undefined
+                  ? data.articles.map((i, index) => (<CardArticle props={data.articles[index]} key={index} />))
+                  : null
+              }
+            </TabPanel>
+             <TabPanel value={value} index={2}>
+                {isLogading
+                  ? <CircularProgress />
+                  : articlesPopTag !== ""
+                    ? articlesPopTag.map((i, index) => (<CardArticle props={articlesPopTag[index]} key={index} />))
+                    : null
                 }
               </TabPanel>
-            </Paper>
           </Grid>
           <Grid item md={3} xs={12}>
             <PopularTags />
@@ -139,93 +163,20 @@ const ContentMainPage = () => {
   );
 }
 
-export default ContentMainPage;
-
-
-
-/* const FetchRequst = async () => {
-    const res = await fetch("https://conduit.productionready.io/api/articles?limit=10&amp;offset=10.")
-    const body = await res.json();
-    return body;
-} */
-
-/* class ContentMainPage extends Component {
-  state = {
-    isLogading: true,
-    data: "",
-    prev: 10,
-  };
-
-  fetchRequst = async (numberPage) => {
-    const res = await fetch(
-      `https://conduit.productionready.io/api/articles?limit=10&amp;offset=${numberPage}.`
-    );
-    const body = await res.json();
-    return body;
-  };
-
-  componentDidMount() {
-    //console.log("###: didMount1");
-    this.fetchRequst(this.state.prev).then((res) =>
-      this.setState({
-        data: res,
-        isLogading: false,
-      })
-    );
-    console.log("###: state", this.state);
-    //console.log("###: didMount2");
+const mapStateToProps = (state) => {
+  const {articlesPopTag, tab, tag} = state.articlePopularTags
+  return {
+    articlesPopTag: articlesPopTag,
+    tab: tab,
+    tag: tag,
   }
+}
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.prev !== prevState.prev) {
-      this.fetchRequst(this.state.prev).then((res) =>
-        this.setState({
-          isLogading: false,
-          data: res,
-        })
-      );
-    }
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onPopularTags: (article, tab, tag) => dispatch(popularTags(article, tab, tag)),
+    onClickTabs: () => dispatch(popularTagsFocusLost())
   }
+}
 
-  onPageNext = () => {
-    //alert(23);
-    this.setState(({ prev }) => {
-      return {
-        isLogading: true,
-        prev: prev + 10,
-      }
-    });
-  };
-
-  render() {
-    const { isLogading } = this.state;
-    const {
-      data: { articles },
-    } = this.state;
-
-    if (isLogading) {
-      return (
-        <Container fixed>
-          <CircularProgress />
-        </Container>
-      );
-    }
-    //console.log("###: state", this.state);
-    //console.log("###: didMount3");
-    return (
-      <>
-        <Container fixed>
-          {articles !== undefined
-            ? articles.map((i, index) => (
-              <CardArticle props={articles[index]} key={index} />
-            ))
-            : null}
-          <Pagination
-            count={50}
-            onChange={this.onPageNext}
-          />
-        </Container>
-      </>
-    );
-  }
-} */
+export default connect(mapStateToProps, mapDispatchToProps)(ContentMainPage);

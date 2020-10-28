@@ -8,6 +8,11 @@ const initialState = {
     token: "",
     updatedAt: "",
     username: "",
+  },
+  articlePopularTags: {
+    articlesPopTag: "",
+    tab: "",
+    tag: "",
   }
 };
 
@@ -19,18 +24,44 @@ const reducer = (state = initialState, action) => {
     case "USER_LOG_IN":
       const { bio, createdAt, email, id, image, token, updatedAt, username } = action.payload;
       return {
-        bio,
-        createdAt,
-        email,
-        id,
-        image,
-        token,
-        updatedAt,
-        username,
+        ...state,
+        user: {
+          bio,
+          createdAt,
+          email,
+          id,
+          image,
+          token,
+          updatedAt,
+          username,
+        }
       };
     case "USER_LOG_OUT":
       return {
-        ...state.user,
+        ...state,
+        user: {
+          ...state.user
+        }
+      };
+    case "POPULAR_TAGS":
+      console.log("####: action", action)
+      const { article, tab, tag } = action.payload;
+      return {
+        ...state,
+        articlePopularTags: {
+          articlesPopTag: article,
+          tab: tab,
+          tag: tag,
+        }
+      };
+    case "POPULAR_TAGS_FOUS_LOST":
+      return {
+        ...state,
+        articlePopularTags: {
+          articlesPopTag: "",
+          tab: "",
+          tag: "",
+        }
       };
     default:
       return state;

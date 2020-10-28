@@ -8,14 +8,13 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import { API, fetchAPI } from '../../../services/requst/requsts';
-
-import s from "./LoginPage.module.sass"
-import { connect } from 'react-redux';
 import { userLoginIn } from '../../../actions/actions';
+import s from "./LoginPage.module.sass"
 
-const LoginPage = ({ onLogIn, username, image }) => {
+const LoginPage = ({ onLogIn}) => {
 
     const [emailValue, setEmailValue] = useState('');
     const [pasValue, setPasValue] = useState('');
@@ -38,7 +37,6 @@ const LoginPage = ({ onLogIn, username, image }) => {
                 password: pasValue,
             }
         });
-        //onLogIn(userData.data.user.image, userData.data.user.username);
         onLogIn(userData.data.user);
         localStorage.setItem('diplomaToken', userData.data.user.token);
         setIsLogin(true);
@@ -90,7 +88,7 @@ const LoginPage = ({ onLogIn, username, image }) => {
                         onClick={hendleAutorithation}
                     >
                         Sign In
-                        </Button>
+                    </Button>
                     <Grid container>
                         <Grid item>
                             <Link href="#" variant="body2">
@@ -112,17 +110,10 @@ const LoginPage = ({ onLogIn, username, image }) => {
     );
 }
 
-const mapStateToProps = (state) => {
-    return {
-        image: state.image,
-        username: state.username
-    };
-};
-
 const mapDispatchToProps = (dispatch) => {
     return {
-        onLogIn: (image, username) => dispatch(userLoginIn(image, username)),
+        onLogIn: (user) => dispatch(userLoginIn(user)),
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
+export default connect(null, mapDispatchToProps)(LoginPage);

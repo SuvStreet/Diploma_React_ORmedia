@@ -67,9 +67,10 @@ const Header = ({username, image}) => {
 }
 
 const mapStateToProps = (state) => {
+    const {image, username} = state.user;
     return {
-        image: state.image,
-        username: state.username
+        image: image,
+        username: username
     };
 };
 
