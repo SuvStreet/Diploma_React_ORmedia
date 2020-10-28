@@ -1,15 +1,18 @@
-import { Button, ButtonGroup, Chip, CircularProgress, Container, Typography } from "@material-ui/core";
+import { Button, ButtonGroup, Chip, CircularProgress, Container, Link, Typography } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import { CardHeader, Avatar } from "@material-ui/core";
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import AddIcon from '@material-ui/icons/Add';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { Link as RouterLink, Redirect } from 'react-router-dom';
 
-import { fetchArticles } from "../../../services/requst";
+import { API, fetchArticles } from "../../../services/requst";
 import { FormatData } from "../../format-date";
 import { withRouter } from "react-router-dom";
 import AddComments from "../../add-comments/add-comments";
-import { Height } from "@material-ui/icons";
+import { connect } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,41 +30,202 @@ const useStyles = makeStyles((theme) => ({
         paddingRight: 0,
         color: "white",
     },
-    cardTitl: {
-        fontSize: "20px"
+    styleUsernameLink: {
+        fontSize: "20px",
+        color: "grey",
+        textDecoration: "underline",
+        transition: "0.5s",
+        "&:hover": {
+            color: "white",
+            transition: "0.5s",
+        },
     },
     cardSub: {
         color: "white",
         fontSize: "12px"
     },
-    btnGr: {
-        paddingTop: theme.spacing(2)
-    },
     articleBody: {
         paddingTop: theme.spacing(3),
         paddingBottom: theme.spacing(5)
+    },
+    btnRoot: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        width: theme.spacing(35)
+    },
+    btnOne: {
+        color: "grey",
+        transition: "0.5s",
+        marginBottom: theme.spacing(1),
+        "&:hover": {
+            color: "white",
+            transition: "0.5s",
+            border: "1px solid white",
+        },
+    },
+    btnTwo: {
+        color: "grey",
+        transition: "0.5s",
+        "&:hover": {
+            color: "red",
+            transition: "0.5s",
+            border: "1px solid red",
+        },
+    },
+    styleTag: {
+        marginRight: theme.spacing(1),
+    },
+    linkRemove: {
+        color: "grey",
+        "&:hover": {
+            color: "white",
+            transition: "0.5s",
+            textDecoration: "none",
+        },
+    },
+    followStyleBtn: {
+        color: "grey",
+        marginBottom: theme.spacing(1),
+        transition: "0.5s",
+        "&:hover": {
+            color: "white",
+            transition: "0.5s",
+            border: "1px solid white",
+        },
+    },
+    followStyleBtnActive: {
+        color: "white",
+        marginBottom: theme.spacing(1),
+        transition: "0.5s",
+        "&:hover": {
+            transition: "0.5s",
+            border: "1px solid white",
+        },
+    },
+    favoriteStyleBtn: {
+        color: "grey",
+        transition: "0.5s",
+        "&:hover": {
+            color: "green",
+            transition: "0.5s",
+            border: "1px solid green",
+        },
+    },
+    favoriteStyleBtnActive: {
+        color: "green",
+        transition: "0.5s",
+        "&:hover": {
+            transition: "0.5s",
+            border: "1px solid green",
+        },
     }
 }));
 
-const ArticlePage = ({ match }) => {
+const token = localStorage.getItem("diplomaToken");
+
+const ArticlePage = ({ match, usernameAutorization }) => {
     const { id } = match.params;
 
     const classes = useStyles();
 
     const [data, setData] = useState(undefined);
+    const [authorArticle, setAuthorArticle] = useState(undefined);
+    const [followingAuthor, setFollowingAuthor] = useState(false);
+    const [removeArticle, setRemoveArticle] = useState(false);
+    const [favoritedArticle, setFavoritedArticle] = useState(false);
+    const [countFavoritedArticle, setCountFavoritedArticle] = useState("");
 
     useEffect(() => {
-        fetchArticles(id).then((res) => {
-            setData(res.article);
-        })
-    }, []);
-    
+        async function articleFetchData() {
+            const artic = await API.get(`https://conduit.productionready.io/api/articles/${id}`);
+            if (artic) {
+                const { article, article: { favorited, favoritesCount, author: { username, following } } } = artic.data;
+                setData(article);
+                setAuthorArticle(username);
+                setFollowingAuthor(following);
+                setFavoritedArticle(favorited);
+                setCountFavoritedArticle(favoritesCount);
+            }
+        }
+        articleFetchData();
+    }, [setFollowingAuthor, setFavoritedArticle, setCountFavoritedArticle]);
+
+    const hendelRemoveArticle = async () => {
+        await API.delete(`https://conduit.productionready.io/api/articles/${id}`);
+        setRemoveArticle(true);
+    }
+
+    const hendelFollow_UnFollow = async () => {
+        if (followingAuthor) {
+            const unFollow = await API.delete(`https://conduit.productionready.io/api/profiles/${authorArticle}/follow`);
+            setFollowingAuthor(unFollow.data.profile.following);
+        }
+        else {
+            const follow = await API.post(`https://conduit.productionready.io/api/profiles/${authorArticle}/follow`);
+            setFollowingAuthor(follow.data.profile.following);
+        }
+    }
+
+    const hendelFavorite = async () => {
+        if (favoritedArticle) {
+            const unFavorite = await API.delete(`https://conduit.productionready.io/api/articles/${id}/favorite`);
+            setFavoritedArticle(unFavorite.data.article.favorited);
+            setCountFavoritedArticle(unFavorite.data.article.favoritesCount);
+        }
+        else {
+            const favorite = await API.post(`https://conduit.productionready.io/api/articles/${id}/favorite`);
+            setFavoritedArticle(favorite.data.article.favorited);
+            setCountFavoritedArticle(favorite.data.article.favoritesCount);
+        }
+    }
+
+    const yourArticleRender = () => {
+        return (
+            <div className={classes.btnRoot}>
+                <Link component={RouterLink} to={`/edit_article/${id}`} startIcon={<EditIcon />} className={classes.linkRemove}>
+                    <Button variant="outlined" className={classes.btnOne}>
+                        Edit Article
+                    </Button>
+                </Link>
+                <Button variant="outlined" startIcon={<DeleteIcon />} className={classes.btnTwo} onClick={hendelRemoveArticle}>
+                    Delete Article
+                </Button>
+            </div>
+        )
+    }
+
+    const notYourArticleRender = () => {
+        //console.log("####: countFavoritedArticle", countFavoritedArticle);
+        return (
+            <div className={classes.btnRoot}>
+                <Button
+                    variant="outlined"
+                    startIcon={<AddIcon />}
+                    className={followingAuthor ? classes.followStyleBtnActive : classes.followStyleBtn}
+                    onClick={hendelFollow_UnFollow}
+                >
+                    {followingAuthor ? `UnFollow ${authorArticle}` : `Follow ${authorArticle}`}
+                </Button>
+                <Button
+                    variant="outlined"
+                    className={favoritedArticle ? classes.favoriteStyleBtnActive : classes.favoriteStyleBtn}
+                    startIcon={<FavoriteIcon />}
+                    onClick={hendelFavorite}
+                >
+                    Favorite Article ({countFavoritedArticle})
+                </Button>
+            </div>
+        )
+    }
+
     return (
         <>
             {data === undefined
                 ? <CircularProgress />
                 : <>
-                    <div className={classes.root} /* style={heightTest} */ >
+                    <div className={classes.root}>
                         <Container maxWidth="md">
                             <Typography variant="h3" className={classes.titleArticle}>{data.title}</Typography>
                             <CardHeader className={classes.card}
@@ -69,20 +233,12 @@ const ArticlePage = ({ match }) => {
                                     <Avatar aria-label="recipe" src={data.author.image} />
                                 }
                                 action={
-                                    <ButtonGroup disableElevation variant="contained" color="primary" className={classes.btnGr}>
-                                        <Button>
-                                            <AddIcon />
-                                            Unfollow wildantinker
-                                        </Button>
-                                        <Button>
-                                            <FavoriteIcon />
-                                            Follow TestingCypress ({data.favoritesCount})
-                                        </Button>
-                                    </ButtonGroup>}
+                                    usernameAutorization === authorArticle ? yourArticleRender() : notYourArticleRender()
+                                }
                                 title={
-                                    <Typography className={classes.cardTitl}>
+                                    <Link component={RouterLink} to={`/profile/${data.author.username}`} className={classes.styleUsernameLink}>
                                         {data.author.username}
-                                    </Typography>}
+                                    </Link>}
                                 subheader={
                                     <Typography className={classes.cardSub}>
                                         {FormatData(data.createdAt)}
@@ -96,16 +252,23 @@ const ArticlePage = ({ match }) => {
                             {data.body}
                         </Typography>
                         {data.tagList.length !== 0
-                            ? data.tagList.map((tag, index) => <Chip label={tag} key={index} />)
+                            ? data.tagList.map((tag, index) => <Chip label={tag} key={index} className={classes.styleTag} />)
                             : null}
                         <hr />
-
-                        {localStorage.getItem("diplomaToken") ? <AddComments slug={id}/> : null}
+                        {token ? <AddComments slug={id} /> : null}
                     </Container>
+                    
+                    {removeArticle ? <Redirect to="/" /> : null}
                 </>
             }
         </>
     )
 }
 
-export default withRouter(ArticlePage);
+const mapStateToProps = (state) => {
+    return {
+        usernameAutorization: state.user.username,
+    }
+}
+
+export default connect(mapStateToProps, null)(withRouter(ArticlePage));

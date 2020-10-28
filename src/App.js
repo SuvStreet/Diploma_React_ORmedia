@@ -8,10 +8,12 @@ import ArticlePage from './components/pages/article-page';
 import SettingsPage from './components/pages/settings-page';
 import NewArticlePage from './components/pages/new-article-page';
 import ProfilePage from './components/pages/profile-page';
+import EditArticlePage from './components/pages/edit-article-page';
 import Header from './components/header';
 import Footer from './components/footer';
 
 import s from './App.module.sass'
+
 
 
 
@@ -27,7 +29,8 @@ function App() {
           <Route path="/article/:id" component={ArticlePage} />
           <Route path="/settings" component={SettingsPage} exact />
           <Route path="/new_article" component={NewArticlePage} exact />
-          <Route path="/profile" component={ProfilePage} exact/>
+          <Route path="/profile/:id" component={ProfilePage} />
+          <Route path="/edit_article/:id" component={EditArticlePage} />
           <Footer />
         </>
         <Route render={() => <h1>404 Pege Not Found!</h1>} />

@@ -9,7 +9,7 @@ import { FormatData } from "../format-date";
 
 const useStyles = makeStyles((theme) => ({
     inputComment: {
-        marginTop: theme.spacing(10),
+        marginTop: theme.spacing(5),
     },
     contAvaBtn: {
         display: "flex",
@@ -18,8 +18,8 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "#ededed",
     },
     avatarStyle: {
-        paddingTop: theme.spacing(2),
-        paddingBottom: theme.spacing(2)
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2)
     },
 
     containerRoot: {
@@ -32,11 +32,11 @@ const useStyles = makeStyles((theme) => ({
     },
     rootInfoCommentUser: {
         display: "flex",
+        justifyContent: "space-between",
         alignItems: "center",
         padding: theme.spacing(2),
     },
     infoCommentUser: {
-        width: theme.spacing(100),
         display: "flex",
         justifyContent: "flex-start",
         alignItems: "center",
@@ -44,9 +44,15 @@ const useStyles = makeStyles((theme) => ({
     style: {
         marginRight: theme.spacing(1)
     },
-    removeComment: {
-        cursor: "pointer"
-    }   
+    btnRemoveMassage: {
+        color: "grey",
+        transition: "0.5s",
+        "&:hover": {
+            color: "red",
+            border: "1px solid red",
+            transition: "0.5s",
+        }
+    }
 }));
 
 const AddComments = ({ image, slug }) => {
@@ -100,12 +106,17 @@ const AddComments = ({ image, slug }) => {
                 <div className={classes.rootInfoCommentUser}>
                     <div className={classes.infoCommentUser}>
                         <Avatar src={image} className={classes.style} />
-                        <Link component={RouterLink} to="/profile" className={classes.style}>{username}</Link>
+                        <Link component={RouterLink} to={`/profile/${username}`} className={classes.style}>{username}</Link>
                         {FormatData(createdAt)}
                     </div>
-                    <div className={classes.removeComment}>
-                        <DeleteForeverIcon onClick={() => hendleRemoveComment(slug, id)} />
-                    </div>
+                    <Button
+                        startIcon={<DeleteForeverIcon />}
+                        variant="outlined"
+                        onClick={() => hendleRemoveComment(slug, id)}
+                        className={classes.btnRemoveMassage}
+                    >
+                        Delete
+                    </Button>
                 </div>
             </div>
         )
@@ -118,7 +129,7 @@ const AddComments = ({ image, slug }) => {
                     id="outlined-multiline-static"
                     label="Write your article (in markdown) *"
                     multiline
-                    rows={7}
+                    rows={5}
                     variant="outlined"
                     className={classes.inputComment}
                     fullWidth
@@ -141,8 +152,9 @@ const AddComments = ({ image, slug }) => {
 }
 
 const mapStateToProps = (state) => {
+    const { image } = state.user;
     return {
-        image: state.image,
+        image,
     };
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Container, TextField, Typography } from "@material-ui/core";
 import { Redirect } from "react-router-dom";
@@ -25,18 +25,29 @@ const useStyles = makeStyles((theme) => ({
 
 const token = localStorage.getItem("diplomaToken");
 
-const NewArticlePage = () => {
+const EditArticlePage = ({ match }) => {
     const classes = useStyles();
+
+    const { id } = match.params;
 
     const [articleTitle, setArticleTitle] = useState("");
     const [articleAbout, setArticleAbout] = useState("");
     const [articleBody, setArticleBody] = useState("");
     const [addTag, setAddTag] = useState([]);
-    const [errorTitle, setErrorTitle] = useState(undefined);
-    const [errorDescription, setErrorDescription] = useState(undefined);
-    const [errorBody, setErrorBody] = useState(undefined);
     const [success, setSuccess] = useState(false);
-    const [slugArticle, setSlugArticle] = useState(false);
+
+    useEffect(() => {
+        async function getFetchData() {
+            const fetchDataArticle = await API.get(`https://conduit.productionready.io/api/articles/${id}`)
+            console.log("###: fetchDataArticle", fetchDataArticle.data.article);
+            const { title, description, body, tagList } = fetchDataArticle.data.article;
+            setArticleTitle(title);
+            setArticleAbout(description);
+            setArticleBody(body);
+            setAddTag(tagList);
+        }
+        getFetchData();
+    }, []);
 
     const hendelAddTag = (event) => {
         let space = " ";
@@ -45,73 +56,38 @@ const NewArticlePage = () => {
     }
 
     const hendlePublish = async (e) => {
-        console.log("###: addTags", addTag);
         e.preventDefault();
-        let publishArticle = await API.post(`https://conduit.productionready.io/api/articles/`, {
+        await API.put(`https://conduit.productionready.io/api/articles/${id}`, {
             article: {
                 tagList: addTag,
                 title: articleTitle,
                 description: articleAbout,
                 body: articleBody
             },
-        }).catch(error => {
-            if (error.request) {
-                const { title, description, body } = error.request.response.errors
-                setErrorTitle(title);
-                setErrorDescription(description);
-                setErrorBody(body);
-            }
         });
-        if (publishArticle) {
-            const { slug } = publishArticle.data.article;
-            setSlugArticle(slug);
-            setSuccess(true);
-        }
-    }
-
-    const errorsRender = () => {
-        return (
-            <>
-                <Container className={classes.rootErrors} >
-                    <Typography variant="subtitle2" gutterBottom>
-                        {errorTitle !== undefined
-                            ? `* title ${errorTitle[0]} ${errorTitle[1]}`
-                            : null}
-                    </Typography>
-                    <Typography variant="subtitle2" gutterBottom>
-                        {errorDescription !== undefined
-                            ? `* description ${errorDescription[0]} ${errorDescription[1]}`
-                            : null}
-                    </Typography>
-                    <Typography variant="subtitle2">
-                        {errorBody !== undefined
-                            ? `* body ${errorBody}`
-                            : null}
-                    </Typography>
-                </Container>
-            </>
-        )
+        setSuccess(true);
     }
 
     const mainRender = () => {
         return (
             <Container maxWidth="sm" className={classes.rootContainer}>
                 <Typography variant="h5">
-                    Your New Article
+                    Edit Article
                 </Typography>
-                {errorsRender()}
                 <form noValidate autoComplete="off">
                     <TextField
                         label="Article Title *"
                         variant="outlined"
                         fullWidth
                         className={classes.input}
-                        onChange={(e) => setArticleTitle(e.target.value)} />
+                        onChange={(e) => setArticleTitle(e.target.value)}
+                        value={articleTitle} />
                     <TextField
                         label="What`s this article about? *"
                         variant="outlined"
                         fullWidth
                         className={classes.input}
+                        value={articleAbout}
                         onChange={(e) => setArticleAbout(e.target.value)} />
                     <TextField
                         id="outlined-multiline-static"
@@ -121,12 +97,14 @@ const NewArticlePage = () => {
                         variant="outlined"
                         className={classes.input}
                         fullWidth
+                        value={articleBody}
                         onChange={(e) => setArticleBody(e.target.value)} />
                     <TextField
                         label="Enter tags"
                         variant="outlined"
                         fullWidth
                         onChange={hendelAddTag}
+                        value={addTag}
                         className={classes.input} />
                     <Button
                         variant="contained"
@@ -137,8 +115,8 @@ const NewArticlePage = () => {
                         onClick={hendlePublish}
                         className={classes.btnPublish}
                     >
-                        Publish article
-                        </Button>
+                        Edit Article
+                    </Button>
                 </form>
             </Container>
         )
@@ -149,11 +127,11 @@ const NewArticlePage = () => {
             {token === null
                 ? <Redirect to="/" />
                 : success
-                    ? <Redirect to={`/article/${slugArticle}`} />
+                    ? <Redirect to={`/article/${id}`} />
                     : mainRender()
             }
         </>
     )
 }
 
-export default NewArticlePage;
+export default EditArticlePage;

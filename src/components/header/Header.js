@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Avatar, Button, ButtonGroup, makeStyles, Typography } from "@material-ui/core";
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import CreateIcon from '@material-ui/icons/Create';
 import SettingsIcon from '@material-ui/icons/Settings';
 
@@ -46,7 +46,7 @@ const Header = ({username, image}) => {
                     </Button>
                     <Button>
                         <Avatar alt="img" src={image} />
-                        <Link to="/profile"  >
+                        <Link to={`/profile/${username}`}  >
                             {username}
                         </Link>
                     </Button>
