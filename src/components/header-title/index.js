@@ -1,3 +1,3 @@
-import HeaderTitle from "./HeaderTitle";
+import HeaderTitle from "./header-title";
 
 export default HeaderTitle;

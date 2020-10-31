@@ -1,8 +1,9 @@
-import { Card, CardHeader, Avatar, makeStyles, CardContent, Typography, IconButton, Chip, Link, Button } from "@material-ui/core";
+import { Card, CardHeader, Avatar, makeStyles, CardContent, Typography, Chip, Link, Button } from "@material-ui/core";
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import { red } from '@material-ui/core/colors';
 import React, { useEffect, useState } from "react";
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, Redirect } from 'react-router-dom';
+import { connect } from "react-redux";
+
 import { FormatData } from "../format-date";
 import { API } from "../../services/requst";
 
@@ -35,32 +36,36 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const CardArticle = ({ props }) => {
+const CardArticle = ({ props, token }) => {
 
     const classes = useStyles();
 
-    //console.log("###: this.props", props);
-
     const [favoritedArticle, setFavoritedArticle] = useState("");
     const [countFavoritedArticle, setCountFavoritedArticle] = useState("");
+    const [redirectFollow, setRedirectFollow] = useState(false);
 
     useEffect(() => {
         setFavoritedArticle(props.favorited);
         setCountFavoritedArticle(props.favoritesCount);
-    }, [setFavoritedArticle, setCountFavoritedArticle])
+    }, [setFavoritedArticle, setCountFavoritedArticle, props.favorited, props.favoritesCount])
 
     const hendelFavorite = async () => {
-        if (favoritedArticle) {
-            const unFavorite = await API.delete(`https://conduit.productionready.io/api/articles/${props.slug}/favorite`);
-            const { favorited, favoritesCount } = unFavorite.data.article;
-            setFavoritedArticle(favorited);
-            setCountFavoritedArticle(favoritesCount);
+        if (token) {
+            if (favoritedArticle) {
+                const unFavorite = await API.delete(`https://conduit.productionready.io/api/articles/${props.slug}/favorite`);
+                const { favorited, favoritesCount } = unFavorite.data.article;
+                setFavoritedArticle(favorited);
+                setCountFavoritedArticle(favoritesCount);
+            }
+            else {
+                const favorite = await API.post(`https://conduit.productionready.io/api/articles/${props.slug}/favorite`);
+                const { favorited, favoritesCount } = favorite.data.article;
+                setFavoritedArticle(favorited);
+                setCountFavoritedArticle(favoritesCount);
+            }
         }
         else {
-            const favorite = await API.post(`https://conduit.productionready.io/api/articles/${props.slug}/favorite`);
-            const { favorited, favoritesCount } = favorite.data.article;
-            setFavoritedArticle(favorited);
-            setCountFavoritedArticle(favoritesCount);
+            setRedirectFollow(true);
         }
     }
 
@@ -72,15 +77,20 @@ const CardArticle = ({ props }) => {
                         <Avatar aria-label="recipe" src={props.author.image} />
                     }
                     action={
-                        <Button
-                            startIcon={<FavoriteIcon />}
-                            variant="outlined"
-                            size="medium"
-                            className={favoritedArticle ? classes.btnFavoriteActive : classes.btnFavorite}
-                            onClick={hendelFavorite}
-                        >
-                            {countFavoritedArticle}
-                        </Button>
+                        <>
+                            {redirectFollow
+                                ? <Redirect to="/login" />
+                                : <Button
+                                    startIcon={<FavoriteIcon />}
+                                    variant="outlined"
+                                    size="medium"
+                                    className={favoritedArticle ? classes.btnFavoriteActive : classes.btnFavorite}
+                                    onClick={hendelFavorite}
+                                >
+                                    {countFavoritedArticle}
+                                </Button>
+                            }
+                        </>
                     }
                     title={
                         <Link
@@ -114,6 +124,11 @@ const CardArticle = ({ props }) => {
     )
 }
 
+const mapStateToProps = (state) => {
+    return{
+        token: state.user.token,
+    }
+}
 
 
-export default CardArticle;
+export default connect(mapStateToProps, null)(CardArticle);

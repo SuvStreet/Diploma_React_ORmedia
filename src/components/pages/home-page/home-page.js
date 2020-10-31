@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 
 import ContentMainPage from "../../content-main-page";
-import Footer from "../../footer/foter";
+import Footer from "../../footer";
 import Header from "../../header";
 import HeaderTitle from "../../header-title";
 

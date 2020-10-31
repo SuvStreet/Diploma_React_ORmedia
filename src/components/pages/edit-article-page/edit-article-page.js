@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Container, TextField, Typography } from "@material-ui/core";
 import { Redirect } from "react-router-dom";
+import { connect } from "react-redux";
 
 import { API } from "../../../services/requst";
 
@@ -23,9 +24,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const token = localStorage.getItem("diplomaToken");
-
-const EditArticlePage = ({ match }) => {
+const EditArticlePage = ({ match, token }) => {
     const classes = useStyles();
 
     const { id } = match.params;
@@ -47,7 +46,7 @@ const EditArticlePage = ({ match }) => {
             setAddTag(tagList);
         }
         getFetchData();
-    }, []);
+    }, [id]);
 
     const hendelAddTag = (event) => {
         let space = " ";
@@ -124,7 +123,7 @@ const EditArticlePage = ({ match }) => {
 
     return (
         <>
-            {token === null
+            {token
                 ? <Redirect to="/" />
                 : success
                     ? <Redirect to={`/article/${id}`} />
@@ -134,4 +133,11 @@ const EditArticlePage = ({ match }) => {
     )
 }
 
-export default EditArticlePage;
+const mapStateToProps = (state) => {
+    const { token } = state.user
+    return {
+        token,
+    }
+}
+
+export default connect(mapStateToProps)(EditArticlePage);

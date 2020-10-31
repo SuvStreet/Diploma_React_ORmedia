@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Container, TextField, Typography } from "@material-ui/core";
 import { Redirect } from "react-router-dom";
+import { connect } from "react-redux";
 
 import { API } from "../../../services/requst";
 
@@ -18,14 +19,12 @@ const useStyles = makeStyles((theme) => ({
     },
     rootErrors: {
         color: "red",
-        fontWeight: 700,
+        fontWeight: "bold",
         marginTop: theme.spacing(1)
     }
 }));
 
-const token = localStorage.getItem("diplomaToken");
-
-const NewArticlePage = () => {
+const NewArticlePage = ({ token }) => {
     const classes = useStyles();
 
     const [articleTitle, setArticleTitle] = useState("");
@@ -45,7 +44,6 @@ const NewArticlePage = () => {
     }
 
     const hendlePublish = async (e) => {
-        console.log("###: addTags", addTag);
         e.preventDefault();
         let publishArticle = await API.post(`https://conduit.productionready.io/api/articles/`, {
             article: {
@@ -156,4 +154,11 @@ const NewArticlePage = () => {
     )
 }
 
-export default NewArticlePage;
+const mapStateToProps = (state) => {
+    const { token } = state.user
+    return {
+        token,
+    }
+}
+
+export default connect(mapStateToProps, null)(NewArticlePage);

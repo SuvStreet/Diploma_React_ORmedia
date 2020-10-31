@@ -1,76 +1,96 @@
-import React, { useState } from "react";
-import { Avatar, Button, ButtonGroup, makeStyles, Typography } from "@material-ui/core";
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Avatar, Button,  makeStyles, Link } from "@material-ui/core";
+import { Link as RouterLink } from 'react-router-dom';
 import CreateIcon from '@material-ui/icons/Create';
 import SettingsIcon from '@material-ui/icons/Settings';
-
-import s from "./Header.module.sass"
 import { connect } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
+    headerWrapper:{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        margin: "20px 30px 0 30px",
+    },
+    logo:{
+        color: "green",
+        fontWeight: "bold",
+        fontSize: theme.spacing(4),
+    },
+    linkStyle: {
+        "&:hover": {
+            textDecoration: "none",
+        },
+    },
+    BtnStyle: {
+        color: "grey",
+        transition: "0.5s",
+        marginRight: theme.spacing(1),
+        "&:hover": {
+            color: "black",
+            transition: "0.5s",
+            border: "1px solid black",
+        },
+    },
+    smallAva: {
+        width: theme.spacing(3),
+        height: theme.spacing(3),
+    },
     styleIcon: {
-        fontSize: 13
+        fontSize: 13,
     },
 }));
 
-const Header = ({username, image}) => {
-
+const Header = ({ username, image, token }) => {
     const classes = useStyles();
 
     const renderNoAutorisatiopn = () => {
         return (
-            <ButtonGroup variant="text" color="primary" aria-label="text primary button group" className={s.headerButtonGroup}>
-                <Button>
-                    <Link to="/login">Sign in</Link>
-                </Button>
-                <Button>
-                    <Link to="/register">Sign up</Link>
-                </Button>
-            </ButtonGroup>
+            <div>
+                <Link component={RouterLink} to={`/login`} className={classes.linkStyle}>
+                    <Button variant="outlined" className={classes.BtnStyle}>Sign in</Button>
+                </Link>
+                <Link component={RouterLink} to={`/register`} className={classes.linkStyle}>
+                    <Button variant="outlined" className={classes.BtnStyle}>Sign up</Button>
+                </Link>
+            </div>
         )
     };
 
     const renderYesAutorisatiopn = () => {
         return (
             <>
-                <ButtonGroup variant="text" color="primary" aria-label="text primary button group" className={s.headerButtonGroup}>
-                    <Button>
-                        <Link to="/new_article">
-                            <CreateIcon className={classes.styleIcon} /> New Article
-                        </Link>
-                    </Button>
-                    <Button>
-                        <Link to="/settings">
-                            <SettingsIcon className={classes.styleIcon} /> Setting
-                        </Link>
-                    </Button>
-                    <Button>
-                        <Avatar alt="img" src={image} />
-                        <Link to={`/profile/${username}`}  >
-                            {username}
-                        </Link>
-                    </Button>
-                </ButtonGroup>
-
+                <div>
+                    <Link component={RouterLink} to={`/new_article`} className={classes.linkStyle}>
+                        <Button startIcon={<CreateIcon />} variant="outlined" className={classes.BtnStyle}>New Article</Button>
+                    </Link>
+                    <Link component={RouterLink} to={`/settings`} className={classes.linkStyle}>
+                        <Button startIcon={<SettingsIcon />} variant="outlined" className={classes.BtnStyle}>Setting</Button>
+                    </Link>
+                    <Link component={RouterLink} to={`/profile/${username}`} className={classes.linkStyle}>
+                        <Button startIcon={<Avatar alt="img" src={image} className={classes.smallAva} />} variant="outlined" className={classes.BtnStyle}>{username}</Button>
+                    </Link>
+                </div>
             </>
         )
     };
 
     return (
-        <div className={s.headerWrapper}>
-            <Link to="/">
-                <Button className={s.logo}>diploma</Button>
+        <div className={classes.headerWrapper}>
+            <Link component={RouterLink} to={`/`} className={classes.linkStyle}>
+                <Button className={classes.logo}>diploma</Button>
             </Link>
-            {localStorage.getItem("diplomaToken") ? renderYesAutorisatiopn() : renderNoAutorisatiopn()}
+            {token ? renderYesAutorisatiopn() : renderNoAutorisatiopn()}
         </div>
     )
 }
 
 const mapStateToProps = (state) => {
-    const {image, username} = state.user;
+    const { image, username, token } = state.user;
     return {
-        image: image,
-        username: username
+        token,
+        image,
+        username
     };
 };
 

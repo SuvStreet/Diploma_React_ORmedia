@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import { Chip, Container, Typography, CircularProgress } from "@material-ui/core";
 
-import { API, fetchPopularTags } from "../../services/requst";
+import { API } from "../../services/requst";
 import { connect } from "react-redux";
 import { popularTags } from "../../actions/actions";
 
@@ -11,7 +11,8 @@ const useStyles = makeStyles(() => ({
         backgroundColor: "#ededed",
         borderRadius: 5,
         paddingBottom: 10,
-        /* position: "fixed", */
+        position: "sticky",
+        top: "2em",
     },
     customChip: {
         backgroundColor: "#5f5f5f",
@@ -28,20 +29,16 @@ const PopularTags = ({ onPopularTags }) => {
 
     const [popularTags, setPopularTags] = useState(null);
 
-    async function fetchData() {
-        const tags = await API.get(`https://conduit.productionready.io/api/tags`);
-        setPopularTags(tags.data.tags);
-    }
-
     useEffect(() => {
+        async function fetchData() {
+            const tags = await API.get(`https://conduit.productionready.io/api/tags`);
+            setPopularTags(tags.data.tags);
+        }
         fetchData();
     }, []);
 
     const hendlePopularTag = async (tag) => {
-        console.log("###: tag", tag);
-        const popularTags = await API.get(`https://conduit.productionready.io/api/articles?tag=${tag}&limit=10&offset=0`);
-        //console.log("###: popularTags", popularTags.data.articles);
-        onPopularTags(popularTags.data.articles, 2, tag);
+        onPopularTags(3, tag);
     }
 
     return (
@@ -56,8 +53,8 @@ const PopularTags = ({ onPopularTags }) => {
 
 const mapDispathToProps = (dispatch) => {
     return {
-        onPopularTags: (article, tab, tag) => dispatch(popularTags(article, tab, tag))
+        onPopularTags: (tab, tag) => dispatch(popularTags(tab, tag))
     }
 }
 
-export default connect(/* mapStateToProps */ null, mapDispathToProps)(PopularTags);
+export default connect(null, mapDispathToProps)(PopularTags);

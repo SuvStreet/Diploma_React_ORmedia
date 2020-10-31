@@ -10,8 +10,7 @@ const initialState = {
     username: "",
   },
   articlePopularTags: {
-    articlesPopTag: "",
-    tab: "",
+    tab: 2,
     tag: "",
   }
 };
@@ -40,16 +39,35 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         user: {
-          ...state.user
+          bio: null,
+          createdAt: "",
+          email: "",
+          id: null,
+          image: "",
+          token: "",
+          updatedAt: "",
+          username: "",
+        }
+      };
+    case "USER_UPDATA":
+      return {
+        ...state,
+        user: {
+          bio: action.payload.bio,
+          createdAt: action.payload.createdAt,
+          email: action.payload.email,
+          id: action.payload.id,
+          image: action.payload.image,
+          token: action.payload.token,
+          updatedAt: action.payload.updatedAt,
+          username: action.payload.username,
         }
       };
     case "POPULAR_TAGS":
-      console.log("####: action", action)
-      const { article, tab, tag } = action.payload;
+      const { tab, tag } = action.payload;
       return {
         ...state,
         articlePopularTags: {
-          articlesPopTag: article,
           tab: tab,
           tag: tag,
         }
@@ -58,8 +76,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         articlePopularTags: {
-          articlesPopTag: "",
-          tab: "",
+          tab: 2,
           tag: "",
         }
       };

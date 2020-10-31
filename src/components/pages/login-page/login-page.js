@@ -1,24 +1,36 @@
 import React, { useState } from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
-import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Link as RouterLink, Redirect } from 'react-router-dom';
+import { makeStyles, Avatar, Container, Button, TextField, Link, Grid, Typography } from '@material-ui/core';
 
-import { API, fetchAPI } from '../../../services/requst/requsts';
+import { API } from '../../../services/requst';
 import { userLoginIn } from '../../../actions/actions';
-import s from "./LoginPage.module.sass"
 
-const LoginPage = ({ onLogIn}) => {
+const useStyles = makeStyles((theme) => ({
+    paper: {
+        marginTop: theme.spacing(8),
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+    },
+    avatar: {
+        margin: theme.spacing(1),
+        backgroundColor: "green",
+    },
+    form: {
+        marginTop: theme.spacing(1),
+    },
+    submit: {
+        margin: "16px 0px 16px"
+    }
+}));
+
+const LoginPage = ({ onLogIn, token }) => {
+    const classes = useStyles();
 
     const [emailValue, setEmailValue] = useState('');
     const [pasValue, setPasValue] = useState('');
-
     const [isLogin, setIsLogin] = useState(false);
 
     const handleEmail = (event) => {
@@ -38,20 +50,20 @@ const LoginPage = ({ onLogIn}) => {
             }
         });
         onLogIn(userData.data.user);
-        localStorage.setItem('diplomaToken', userData.data.user.token);
+        localStorage.setItem("diplomaToken", userData.data.user.token);
         setIsLogin(true);
     }
 
     const render = () => {
         return (
-            <div className={s.paper}>
-                <Avatar className={s.avatar}>
+            <div className={classes.paper}>
+                <Avatar className={classes.avatar}>
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
-                <form className={s.form} noValidate /* onSubmit={onLogIn} */>
+                <form className={classes.form} noValidate /* onSubmit={onLogIn} */>
                     <TextField
                         variant="outlined"
                         margin="normal"
@@ -83,16 +95,16 @@ const LoginPage = ({ onLogIn}) => {
                         fullWidth
                         variant="contained"
                         color="primary"
-                        className={s.submit}
-                        disabled={emailValue && pasValue !== "" ? false : true}
+                        className={classes.submit}
+                        disabled={emailValue && pasValue ? false : true}
                         onClick={hendleAutorithation}
                     >
                         Sign In
                     </Button>
                     <Grid container>
                         <Grid item>
-                            <Link href="#" variant="body2">
-                                {"Don't have an account? Sign Up"}
+                            <Link component={RouterLink} to={`/register`} variant="body2">
+                                Don't have an account? Sign Up
                             </Link>
                         </Grid>
                     </Grid>
@@ -103,11 +115,21 @@ const LoginPage = ({ onLogIn}) => {
 
     return (
         <Container component="main" maxWidth="xs">
-            {localStorage.getItem('diplomaToken')
+            {token
                 ? <Redirect to="/" />
-                : render()}
+                : isLogin
+                    ? <Redirect to="/" />
+                    : render()
+            }
         </Container>
     );
+}
+
+const mapStateToProps = (state) => {
+    const { token } = state.user
+    return {
+        token,
+    }
 }
 
 const mapDispatchToProps = (dispatch) => {
@@ -116,4 +138,4 @@ const mapDispatchToProps = (dispatch) => {
     };
 };
 
-export default connect(null, mapDispatchToProps)(LoginPage);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);

@@ -79,7 +79,7 @@ const AddComments = ({ image, slug }) => {
     }, [flagComment]);
 
     const handelAddComment = async () => {
-        const commAdd = await API.post(`https://conduit.productionready.io/api/articles/${slug}/comments`, {
+        await API.post(`https://conduit.productionready.io/api/articles/${slug}/comments`, {
             comment: {
                 body: commentBody
             }
@@ -89,7 +89,7 @@ const AddComments = ({ image, slug }) => {
     }
 
     async function hendleRemoveComment(slug, id) {
-        const comm = await API.delete(`https://conduit.productionready.io/api/articles/${slug}/comments/${id}`);
+        await API.delete(`https://conduit.productionready.io/api/articles/${slug}/comments/${id}`);
         setFlagComment(true);
     }
 

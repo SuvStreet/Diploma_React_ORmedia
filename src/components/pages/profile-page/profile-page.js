@@ -6,6 +6,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import { Link as RouterLink, Redirect } from 'react-router-dom';
 
 import { API } from "../../../services/requst";
+import TabPanelProject from "../../tab-panel-project";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -65,22 +66,22 @@ const useStyles = makeStyles((theme) => ({
             transition: "0.5s",
             border: "1px solid black",
         },
+    },
+    tabPanelStyle: {
+
     }
 }));
 
-const token = localStorage.getItem("diplomaToken");
-
-const ProfilePage = ({ username, match }) => {
+const ProfilePage = ({ username, match, token }) => {
     const classes = useStyles();
 
     const { id } = match.params;
-
-    //console.log("###: user", id);
 
     const [imageUser, setImageUser] = useState("");
     const [usernameUser, setUsernameUser] = useState("");
     const [bioUser, setBioUser] = useState("");
     const [followingAuthor, setFollowingAuthor] = useState(false);
+    const [redirectFollow, setRedirectFollow] = useState(false);
 
     useEffect(() => {
         async function dataUser() {
@@ -93,16 +94,21 @@ const ProfilePage = ({ username, match }) => {
             setFollowingAuthor(following);
         }
         dataUser();
-    }, [setFollowingAuthor]);
+    }, [setFollowingAuthor, id]);
 
     const hendelFollow_UnFollow = async () => {
-        if (followingAuthor) {
-            const unFollow = await API.delete(`https://conduit.productionready.io/api/profiles/${id}/follow`);
-            setFollowingAuthor(unFollow.data.profile.following);
+        if (token) {
+            if (followingAuthor) {
+                const unFollow = await API.delete(`https://conduit.productionready.io/api/profiles/${id}/follow`);
+                setFollowingAuthor(unFollow.data.profile.following);
+            }
+            else {
+                const follow = await API.post(`https://conduit.productionready.io/api/profiles/${id}/follow`);
+                setFollowingAuthor(follow.data.profile.following);
+            }
         }
         else {
-            const follow = await API.post(`https://conduit.productionready.io/api/profiles/${id}/follow`);
-            setFollowingAuthor(follow.data.profile.following);
+            setRedirectFollow(true);
         }
     }
 
@@ -115,7 +121,7 @@ const ProfilePage = ({ username, match }) => {
                 onClick={hendelFollow_UnFollow}
             >
                 {followingAuthor ? `UnFollow ${usernameUser}` : `Follow ${usernameUser}`}
-            </Button>
+            </Button >
         )
     }
 
@@ -134,10 +140,10 @@ const ProfilePage = ({ username, match }) => {
     }
 
     return (
-        <>
-            {token === null
-                ? <Redirect to="/" />
-                : <div className={classes.root}>
+        redirectFollow
+            ? <Redirect to="/login" />
+            : <>
+                <div className={classes.root}>
                     <Container maxWidth="md" className={classes.containerStyle}>
                         <Avatar src={imageUser} className={classes.large} />
                         <Typography variant="h5" className={classes.usernameText}>{usernameUser}</Typography>
@@ -145,15 +151,22 @@ const ProfilePage = ({ username, match }) => {
                         {username === usernameUser ? profileYourPage() : profileNotYourPage()}
                     </Container>
                 </div>
-            }
-        </>
+                <Container maxWidth="md">
+                    <TabPanelProject
+                        tabLabelOne={"My Posts"}
+                        tabLabelTwo={"Favorited Posts"}
+                        usernameUser={id}
+                    />
+                </Container>
+            </>
     )
 }
 
 const mapStateToProps = (state) => {
-    const { username } = state.user;
+    const { username, token } = state.user;
     return {
-        username: username,
+        token,
+        username,
     }
 }
 

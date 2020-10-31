@@ -7,20 +7,25 @@ const userLoginIn = (user) => {
   };
 };
 
-const userLoginOut = (user) => {
+const userLoginOut = () => {
   return {
-    type: "USER_LOG_OUT",
+    type: "USER_LOG_OUT"
+  };
+};
+
+const userUpdata = (user) => {
+  return {
+    type: "USER_UPDATA",
     payload: {
       ...user
     }
   };
 };
 
-const popularTags = (article, tab, tag) => {
+const popularTags = (tab, tag) => {
   return {
     type: "POPULAR_TAGS",
     payload: {
-      article,
       tab,
       tag
     }
@@ -33,4 +38,4 @@ const popularTagsFocusLost = () => {
   };
 };
 
-export { userLoginIn, userLoginOut, popularTags, popularTagsFocusLost };
+export { userLoginIn, userLoginOut, userUpdata, popularTags, popularTagsFocusLost };
