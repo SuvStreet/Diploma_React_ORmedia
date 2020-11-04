@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
     rootContainer: {
         textAlign: "center",
         marginTop: theme.spacing(5),
+        flex: "1 0 auto",
     },
     rootForm: {
         display: "flex",

@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        flex: "0 0 auto"
     },
     linkFooter: {
         fontWeight: "bold",

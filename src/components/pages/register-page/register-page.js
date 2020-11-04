@@ -8,6 +8,9 @@ import { connect } from 'react-redux';
 import { API } from '../../../services/requst/requsts';
 
 const useStyles = makeStyles((theme) => ({
+    styleMainContainer: {
+        flex: "1 0 auto",
+    },
     paper: {
         marginTop: theme.spacing(8),
         display: "flex",
@@ -94,7 +97,7 @@ const SignUp = ({ token }) => {
 
     const render = () => {
         return (
-            <Container component="main" maxWidth="xs">
+            <Container component="main" maxWidth="xs" className={classes.styleMainContainer}>
                 <div className={classes.paper}>
                     <Avatar className={classes.avatar}>
                         <LockOutlinedIcon />

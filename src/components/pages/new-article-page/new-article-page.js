@@ -10,6 +10,7 @@ const useStyles = makeStyles((theme) => ({
     rootContainer: {
         textAlign: "center",
         marginTop: theme.spacing(5),
+        flex: "1 0 auto",
     },
     input: {
         marginTop: theme.spacing(2)
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     rootErrors: {
         color: "red",
         fontWeight: "bold",
-        marginTop: theme.spacing(1)
+        marginTop: theme.spacing(1),
     }
 }));
 

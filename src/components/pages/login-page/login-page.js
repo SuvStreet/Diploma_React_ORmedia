@@ -8,6 +8,9 @@ import { API } from '../../../services/requst';
 import { userLoginIn } from '../../../actions/actions';
 
 const useStyles = makeStyles((theme) => ({
+    styleMainContainer: {
+        flex: "1 0 auto",
+    },
     paper: {
         marginTop: theme.spacing(8),
         display: "flex",
@@ -114,7 +117,7 @@ const LoginPage = ({ onLogIn, token }) => {
     }
 
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="xs" className={classes.styleMainContainer}>
             {token
                 ? <Redirect to="/" />
                 : isLogin

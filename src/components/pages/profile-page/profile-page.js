@@ -29,6 +29,9 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(2),
         fontWeight: "bold"
     },
+    styleMainContainer: {
+        flex: "1 0 auto",
+    },
     followStyleBtn: {
         color: "grey",
         marginBottom: theme.spacing(1),
@@ -151,7 +154,7 @@ const ProfilePage = ({ username, match, token }) => {
                         {username === usernameUser ? profileYourPage() : profileNotYourPage()}
                     </Container>
                 </div>
-                <Container maxWidth="md">
+                <Container maxWidth="md" className={classes.styleMainContainer}>
                     <TabPanelProject
                         tabLabelOne={"My Posts"}
                         tabLabelTwo={"Favorited Posts"}

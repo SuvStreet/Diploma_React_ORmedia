@@ -44,6 +44,9 @@ const useStyles = makeStyles((theme) => ({
         color: "white",
         fontSize: "12px"
     },
+    styleMainContainer: {
+        flex: "1 0 auto",
+    },
     articleBody: {
         paddingTop: theme.spacing(3),
         paddingBottom: theme.spacing(5)
@@ -278,7 +281,7 @@ const ArticlePage = ({ match, usernameAutorization, token }) => {
                             />
                         </Container>
                     </div>
-                    <Container maxWidth="md" >
+                    <Container maxWidth="md" className={classes.styleMainContainer}>
                         <Typography variant="h5" className={classes.articleBody}>
                             {data.body}
                         </Typography>
